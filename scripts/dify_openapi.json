@@ -1,0 +1,151 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "RAVDA",
+    "description": "Dify-compatible OpenAPI subset for RAVDA Agent tools",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://host.docker.internal:8000",
+      "description": "RAVDA on host (Docker Desktop)"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "ravda_health",
+        "summary": "Health check",
+        "description": "Check whether RAVDA API is running",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string" },
+                    "service": { "type": "string" },
+                    "rag_configured": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets": {
+      "get": {
+        "operationId": "ravda_list_datasets",
+        "summary": "List recent datasets",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 10 },
+            "description": "Max datasets to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Dataset list",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/sessions": {
+      "post": {
+        "operationId": "ravda_create_session",
+        "summary": "Create conversation session",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Dataset ID from upload"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": { "type": "string" },
+                    "dataset_id": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/datasets/{dataset_id}/query": {
+      "post": {
+        "operationId": "ravda_query",
+        "summary": "Natural language data query",
+        "description": "Ask a question about the dataset; returns summary, result and charts",
+        "parameters": [
+          {
+            "name": "dataset_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Dataset ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["question"],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "description": "Natural language question"
+                  },
+                  "session_id": {
+                    "type": "string",
+                    "description": "Optional session ID for follow-up questions"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Query result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "summary": { "type": "string" },
+                    "session_id": { "type": "string" },
+                    "error": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

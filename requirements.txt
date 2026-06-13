@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pandas
+numpy
+matplotlib
+python-multipart
+openpyxl
+python-dotenv
+pymysql
+openai
+pytest
+httpx
+ragflow-sdk==0.19.0
+streamlit
